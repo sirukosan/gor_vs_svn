@@ -2,7 +2,7 @@
 INPUT_DSSP_FOLDER = 'data/input/dssp/'
 INPUT_FASTA_FOLDER = 'data/input/fasta/'
 TRAIN_FASTA_FILE_NAME = "data/blind_test/train.fasta"
-ROW_BLIND_FASTA_FILE_NAME = 'data/blind_test/row_blind.fasta'
+ROW_BLIND_FASTA_FILE_NAME = 'data/input/blind_test/row_blind.fasta'
 BLIND_FASTA_FILE_NAME = 'data/blind_test/blind.fasta'
 BLIND_DSSP_FILE_NAME = 'data/blind_test/blind.dssp'
 BLASTCLUST_OUT_FILE_NAME = 'data/blind_test/blastclust.out'
