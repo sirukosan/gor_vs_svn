@@ -1,9 +1,11 @@
 import os
+import urllib.request
+import pandas as pd
+
 from constants import *
 from Bio import SeqIO
 from Bio.PDB import DSSP
 from Bio.PDB import PDBParser
-import urllib.request
 
 
 def make_dssp(pdb_id, chain, with_aa=True, chain_delimiter=':'):
@@ -68,6 +70,19 @@ def combine_fasta_files(fastas_paths, out_file):
         for filename in fastas_paths:
             for seq_record in SeqIO.parse(filename, "fasta"):
                 out.write('>' + str(seq_record.id) + '\n' + str(seq_record.seq) + '\n')
+
+
+def divide_fasta_file(input_file, output_dir):
+    """
+    Divide fasta file by single files
+
+    :param input_file: input fasta file
+    :param output_dir: output directory
+    """
+    with open(input_file, 'r'):
+        for seq_record in SeqIO.parse(input_file, "fasta"):
+            with open(output_dir + str(seq_record.id).replace(':', '_'), "w") as out_file:
+                out_file.write('>' + str(seq_record.id) + '\n' + str(seq_record.seq) + '\n')
 
 
 def prepare_fasta_for_blastclust(in_fasta, out_fasta):
@@ -135,3 +150,19 @@ def get_blastp_ids(blastp_out_file, identity_threshold=1000):
             remained_ids.append(key)
 
     return remained_ids
+
+
+def parse_pssm_file(pssm_file):
+    """
+    Parsing pssm file
+
+    :param pssm_file: input pssm file
+    :return: pandas dataframe
+    """
+    colnames = ['res'] + AA_ORDER
+    usecols = [1] + list(range(22, 42))
+    df = pd.read_table(pssm_file, sep=r"\s*", header=None, skiprows=3, skipfooter=5, usecols=usecols)
+    df.columns = colnames
+    df.set_index('res', inplace=True)
+    df = df / 100
+    return df
