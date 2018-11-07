@@ -8,15 +8,14 @@ from Bio.PDB import DSSP
 from Bio.PDB import PDBParser
 
 
-def make_dssp(pdb_id, chain, with_aa=True, chain_delimiter=':'):
+def make_dssp(pdb_id, chain, chain_delimiter=':'):
     """
     Retrieve dssp string from PDB database
 
     :param pdb_id: pdb id
     :param chain: pdb chain id
-    :param with_aa: add amino acids to result
     :param chain_delimiter: delimiter between id and chain id
-    :return: fasta-like string with dssp string (and aa string in case with_aa = True)
+    :return: id, aa sequence, ss sequence
     """
     url = PDB_URL + pdb_id + '.pdb'
     urllib.request.urlretrieve(url, pdb_id)
@@ -32,13 +31,8 @@ def make_dssp(pdb_id, chain, with_aa=True, chain_delimiter=':'):
             aa += dssp[key][1]
             ss += SS_MAP[dssp[key][2]]
 
-    body = '\n' + ss
-    if with_aa:
-        body = '\n' + aa + body
-
-    result = ">" + pdb_id + chain_delimiter + chain + body
     os.remove(pdb_id)
-    return result
+    return pdb_id + chain_delimiter + chain, aa, ss
 
 
 def remove_from_fasta(fasta_file_name, ids, leave=False):
@@ -72,17 +66,47 @@ def combine_fasta_files(fastas_paths, out_file):
                 out.write('>' + str(seq_record.id) + '\n' + str(seq_record.seq) + '\n')
 
 
-def divide_fasta_file(input_file, output_dir):
+def divide_fasta_file(input_file, output_dir, ext='', is_fasta=True):
     """
     Divide fasta file by single files
 
+    :param ext: extension of new files
+    :param is_fasta: is it fasta file or just fasta-like file (like dssp)
     :param input_file: input fasta file
     :param output_dir: output directory
     """
+    if not is_fasta:
+        divide_fasta_like_file(input_file, output_dir, ext)
+        return
+
     with open(input_file, 'r'):
         for seq_record in SeqIO.parse(input_file, "fasta"):
-            with open(output_dir + str(seq_record.id).replace(':', '_'), "w") as out_file:
+            with open(output_dir + str(seq_record.id).replace(':', '_') + '.' + ext, "w") as out_file:
                 out_file.write('>' + str(seq_record.id) + '\n' + str(seq_record.seq) + '\n')
+
+
+def divide_fasta_like_file(input_file, output_dir, ext=''):
+    """
+    Divide file like fasta file by single files
+
+    :param ext: extension of new files
+    :param input_file: input fasta file
+    :param output_dir: output directory
+    """
+    with open(input_file, 'r') as file:
+        body = ''
+        p_id = ''
+        for line in file:
+            if line[0] == '>':
+                if len(p_id) > 0:
+                    with open(output_dir + p_id.replace(':', '_') + '.' + ext, "w") as out_file:
+                        out_file.write('>' + p_id.replace(':', '_') + '\n' + body + '\n')
+                    body = ''
+                p_id = line.strip()[1:]
+            else:
+                body += line.strip()
+        with open(output_dir + p_id.replace(':', '_') + '.' + ext, "w") as out_file:
+            out_file.write('>' + p_id.replace(':', '_') + '\n' + body + '\n')
 
 
 def prepare_fasta_for_blastclust(in_fasta, out_fasta):
@@ -102,6 +126,10 @@ def prepare_fasta_for_blastclust(in_fasta, out_fasta):
 
 
 def unprepare_fasta_after_blastclust(in_fasta):
+    """
+    remove indecies from fasta after blastclust
+    :param in_fasta: input fasta file
+    """
     tmp_file_name = in_fasta + TMP
 
     with open(tmp_file_name, 'w') as tmp_file:
@@ -166,3 +194,54 @@ def parse_pssm_file(pssm_file):
     df.set_index('res', inplace=True)
     df = df / 100
     return df
+
+
+def restore_profile_from_csv(csv_file):
+    """
+    Restoring profile from csv file
+
+    :param csv_file: csv file
+    :return: numpy 2d array
+    """
+    with open(csv_file) as profile_csv:
+        profile = pd.read_csv(profile_csv).values[:, 1:].astype(float)
+        return profile
+
+
+def get_relative_file(in_file, directory, ext):
+    """
+    get path to file in other directory with other extention
+    :param in_file: input path
+    :param directory: other directory
+    :param ext: new extention
+    :return:
+    """
+    filename_w_ext = os.path.basename(in_file)
+    filename, file_extension = os.path.splitext(filename_w_ext)
+    return os.path.join(directory, filename + '.' + ext)
+
+
+def get_dssp_from_file(in_file):
+    """
+    Get dssp string from file with single inline dssp entity
+
+    :param in_file: input dssp file
+    :return: dssp string
+    """
+    with open(in_file) as file:
+        return file.readlines()[1].strip()
+
+
+def is_zero_profile(in_file):
+    profile = restore_profile_from_csv(in_file)
+    for i in range(0, profile.shape[0]):
+        for j in range(0, profile.shape[1]):
+            if profile[i,j] != 0:
+                return False
+    return True
+
+
+def remove_zero_profiles(profile_files):
+    for profile_file in profile_files:
+        if is_zero_profile(profile_file):
+            os.remove(profile_file)

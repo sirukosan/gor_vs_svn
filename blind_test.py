@@ -1,6 +1,6 @@
 import subprocess
 import glob
-from utils import *
+from utils.utils import *
 
 combine_fasta_files(glob.glob(INPUT_FASTA_FOLDER + '*'), TRAIN_FASTA_FILE_NAME)
 subprocess.check_call([SCRIPT_MAKEBLASTDB, TRAIN_FASTA_FILE_NAME])
@@ -13,8 +13,12 @@ subprocess.check_call([SCRIPT_BLASTP, BLIND_FASTA_FILE_NAME, TRAIN_FASTA_FILE_NA
 remained_ids = get_blastp_ids(BLASTP_OUT_FILE_NAME, 30)
 remove_from_fasta(BLIND_FASTA_FILE_NAME, remained_ids, True)
 
-with open(BLIND_DSSP_FILE_NAME, 'w') as blind_dssp_file:
-    for seq_record in SeqIO.parse(BLIND_FASTA_FILE_NAME, "fasta"):
-        pdb_id = seq_record.id.split(':')[0]
-        chain = seq_record.id.split(':')[1]
-        blind_dssp_file.write(make_dssp(pdb_id, chain) + '\n')
+for seq_record in SeqIO.parse(BLIND_FASTA_FILE_NAME, "fasta"):
+    pdb_id = seq_record.id.split(':')[0]
+    chain = seq_record.id.split(':')[1]
+    dssp_id, aa, ss = make_dssp(pdb_id, chain)
+    with open(BLIND_DSSP_DIR + dssp_id + '.dssp', 'w') as blind_dssp_file, open(
+            BLIND_FASTA_DIR + dssp_id + '.fasta', 'w') as blind_fasta_file:
+        blind_dssp_file.write('>' + dssp_id + '\n' + ss)
+        blind_fasta_file.write('>' + dssp_id + '\n' + aa)
+

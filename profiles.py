@@ -1,6 +1,7 @@
 import subprocess
+import glob
 
-from utils import *
+from utils.utils import *
 
 subprocess.check_call([SCRIPT_MAKEBLASTDB, PROFILES_DB])
 subprocess.check_call([SCRIPT_PSIBLAST, PROFILES_DB, INPUT_FASTA_FOLDER,
@@ -9,3 +10,6 @@ subprocess.check_call([SCRIPT_PSIBLAST, PROFILES_DB, INPUT_FASTA_FOLDER,
 for filename in os.listdir(PROFILES_OUTPUT_PSSM_DIR):
     df = parse_pssm_file(PROFILES_OUTPUT_PSSM_DIR + filename)
     df.to_csv(PROFILES_OUTPUT_CSV_DIR + os.path.splitext(filename)[0] + '.csv')
+
+remove_zero_profiles(glob.glob(PROFILES_OUTPUT_CSV_DIR + '*'))
+
