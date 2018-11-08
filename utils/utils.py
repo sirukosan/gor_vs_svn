@@ -245,3 +245,12 @@ def remove_zero_profiles(profile_files):
     for profile_file in profile_files:
         if is_zero_profile(profile_file):
             os.remove(profile_file)
+
+
+def get_ids_from_list_file(list_file):
+    res = []
+    with open(list_file, 'r') as file:
+        for line in file:
+            res.append(line.strip())
+    return res
+

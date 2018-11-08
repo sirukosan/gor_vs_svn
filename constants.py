@@ -1,6 +1,7 @@
 # PATHS
 INPUT_DSSP_FOLDER = 'data/input/dssp/'
 INPUT_FASTA_FOLDER = 'data/input/fasta/'
+INPUT_CV_DIR = 'data/input/svm/cv/'
 TRAIN_FASTA_FILE_NAME = "data/blind_test/train.fasta"
 ROW_BLIND_FASTA_FILE_NAME = 'data/input/blind_test/row_blind.fasta'
 BLIND_FASTA_FILE_NAME = 'data/blind_test/blind.fasta'
@@ -19,6 +20,8 @@ PROFILES_BLIND_OUTPUT_CSV_DIR = "data/profiles_blind/out/csv_profiles/"
 PROFILES_BLIND_INPUT_FASTA_FILE = "data/blind_test/blind.fasta"
 GOR_OUT_DIR = "data/gor/"
 GOR_TRAINED_FILE = GOR_OUT_DIR + "gor_trained.csv"
+SVM_DIR = "data/svm/"
+SVM_TESTS_DIR = "data/svm/tests/"
 
 SCRIPT_MAKEBLASTDB = 'scripts/makeblastdb.sh'
 SCRIPT_BLASTCLUST = 'scripts/blastclust.sh'
@@ -49,3 +52,5 @@ SS_MAP = {'H': 'H',
 window = 17
 wind_l = 0 - window // 2
 wind_r = window // 2
+
+C_GAMMA_SET = [(1, 1), (2, 0.8), (2.6, 0.5), (1.8, 0.2)]
