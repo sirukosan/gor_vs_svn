@@ -1,3 +1,5 @@
+from sys import stdout
+
 import numpy as np
 from sklearn import svm
 import pickle
@@ -6,9 +8,9 @@ import time
 from utils.utils import *
 
 
-def build_vectors_for_profile(profile_file):
+def build_vectors_for_profile(profile_file, dssp_dir):
     profile = restore_profile_from_csv(profile_file)
-    dssp = get_dssp_from_file(get_relative_file(profile_file, INPUT_DSSP_FOLDER, 'dssp'))
+    dssp = get_dssp_from_file(get_relative_file(profile_file, dssp_dir, 'dssp'))
     Y = transform_dssp_to_vector(dssp)
     X = np.empty((0, window * 20))
     for i in range(0, profile.shape[0]):
@@ -34,13 +36,13 @@ def transform_dssp_to_vector(dssp):
     return res
 
 
-def build_vectors(profile_files, out_x_file, out_y_file, log_out, exclude=None):
+def build_vectors(profile_files, out_x_file, out_y_file, dssp_dir, log_out=stdout, exclude=[]):
     i = 0
     with open(out_x_file, 'ab') as x_file, open(out_y_file, 'ab') as y_file:
         for profile_file in profile_files:
             if os.path.splitext(os.path.basename(profile_file))[0] not in exclude:
                 log_out.write(str(i) + ' processing ' + profile_file + '\n')
-                y, x = build_vectors_for_profile(profile_file)
+                y, x = build_vectors_for_profile(profile_file, dssp_dir)
                 np.savetxt(x_file, x, delimiter=",", fmt='%1.3f')
                 np.savetxt(y_file, y, delimiter=",", fmt='%i')
                 i += 1

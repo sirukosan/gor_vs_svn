@@ -22,6 +22,7 @@ GOR_OUT_DIR = "data/gor/"
 GOR_TRAINED_FILE = GOR_OUT_DIR + "gor_trained.csv"
 SVM_DIR = "data/svm/"
 SVM_TESTS_DIR = "data/svm/tests/"
+SVM_BLIND_VECTORS_DIR = "data/svm/blind_vectors/"
 
 SCRIPT_MAKEBLASTDB = 'scripts/makeblastdb.sh'
 SCRIPT_BLASTCLUST = 'scripts/blastclust.sh'

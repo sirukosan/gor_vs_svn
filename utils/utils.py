@@ -1,6 +1,7 @@
 import os
 import urllib.request
 import pandas as pd
+import numpy as np
 
 from constants import *
 from Bio import SeqIO
@@ -203,9 +204,7 @@ def restore_profile_from_csv(csv_file):
     :param csv_file: csv file
     :return: numpy 2d array
     """
-    with open(csv_file) as profile_csv:
-        profile = pd.read_csv(profile_csv).values[:, 1:].astype(float)
-        return profile
+    return np.loadtxt(csv_file, delimiter=",", skiprows=1, usecols=range(1, 21))
 
 
 def get_relative_file(in_file, directory, ext):
@@ -236,7 +235,7 @@ def is_zero_profile(in_file):
     profile = restore_profile_from_csv(in_file)
     for i in range(0, profile.shape[0]):
         for j in range(0, profile.shape[1]):
-            if profile[i,j] != 0:
+            if profile[i, j] != 0:
                 return False
     return True
 
@@ -253,4 +252,3 @@ def get_ids_from_list_file(list_file):
         for line in file:
             res.append(line.strip())
     return res
-

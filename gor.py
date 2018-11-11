@@ -6,8 +6,6 @@ from utils.eval_utils import *
 np_result = gor_train(glob.glob(PROFILES_OUTPUT_CSV_DIR + '*'), INPUT_DSSP_FOLDER)
 save_gor_as_csv(np_result)
 
-
-
 acc_sum = 0
 number = 0
 
@@ -18,5 +16,5 @@ for profile_file in glob.glob(PROFILES_BLIND_OUTPUT_CSV_DIR + '*'):
         acc_sum += get_accuracy(y_test, y_pred)
         number += 1
 
-acc = acc_sum/number
+acc = acc_sum / number
 print(acc)
