@@ -1,9 +1,13 @@
-import numpy as np
-
 from utils.utils import *
 
 
 def gor_train(profile_files, dssp_dir):
+    """
+    Train GOR model
+    :param profile_files: file names of profiles
+    :param dssp_dir: directory of dssp sequences
+    :return: numpy array represented sequence profile
+    """
     res = None
     i = 0
     for profile_file in profile_files:
@@ -17,6 +21,12 @@ def gor_train(profile_files, dssp_dir):
 
 
 def window_index(ss, i):
+    """
+    return index of windowgiven args
+    :param ss: second structure
+    :param i: index of the row
+    :return: index of the window
+    """
     if ss == 'h':
         return window // 2 + i
     elif ss == 'e':
@@ -28,6 +38,12 @@ def window_index(ss, i):
 
 
 def process_profile(profile_csv_path, dssp_path):
+    """
+    return GOR model for one profile
+    :param profile_csv_path: path to the csv profile file
+    :param dssp_path: path to the file contained dssp sequence
+    :return: GOR model for one profile in numpy array
+    """
     with open(dssp_path) as dssp:
         profile = restore_profile_from_csv(profile_csv_path)
         ss = (dssp.readlines()[1].lower().strip()).replace('-', 'c')
@@ -45,6 +61,12 @@ def process_profile(profile_csv_path, dssp_path):
 
 
 def predict_profile(profile_csv_path, gor_csv_path):
+    """
+    Predict the dssp sequence for given profile.
+    :param profile_csv_path: path to the profile csv file
+    :param gor_csv_path: path to the GOR model csv file
+    :return: predicted dssp sequence
+    """
     profile = restore_profile_from_csv(profile_csv_path)
     gor = restore_gor_from_csv(gor_csv_path)
     res = ''
@@ -68,6 +90,10 @@ def predict_profile(profile_csv_path, gor_csv_path):
 
 
 def save_gor_as_csv(numpy_gor_matrix):
+    """
+    saving GOR model to csv file
+    :param numpy_gor_matrix: GOR numpy matrix
+    """
     iterables = [SS_ORDER, list(range(wind_l, wind_r + 1))]
     m_index = pd.MultiIndex.from_product(iterables, names=['ss', 'pos'])
     pd_result = pd.DataFrame(data=numpy_gor_matrix, index=m_index, columns=AA_ORDER)
@@ -75,6 +101,11 @@ def save_gor_as_csv(numpy_gor_matrix):
 
 
 def restore_gor_from_csv(csv_file):
+    """
+    Restoring GOR model from csv file
+    :param csv_file: path to the GOR csv file
+    :return: GOR model numpy array
+    """
     with open(csv_file) as gor_csv:
         gor = pd.read_csv(gor_csv).values[:, 2:].astype(float)
         return gor

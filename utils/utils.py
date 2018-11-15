@@ -232,6 +232,11 @@ def get_dssp_from_file(in_file):
 
 
 def is_zero_profile(in_file):
+    """
+    Check if profile containes only zeroes
+    :param in_file: in profile file
+    :return: bool value
+    """
     profile = restore_profile_from_csv(in_file)
     for i in range(0, profile.shape[0]):
         for j in range(0, profile.shape[1]):
@@ -241,12 +246,21 @@ def is_zero_profile(in_file):
 
 
 def remove_zero_profiles(profile_files):
+    """
+    Remove profles containe only zeroes
+    :param profile_files: profile files
+    """
     for profile_file in profile_files:
         if is_zero_profile(profile_file):
             os.remove(profile_file)
 
 
 def get_ids_from_list_file(list_file):
+    """
+    Get rows from file as array
+    :param list_file: in file
+    :return: array
+    """
     res = []
     with open(list_file, 'r') as file:
         for line in file:

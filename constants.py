@@ -29,6 +29,8 @@ SCRIPT_BLASTCLUST = 'scripts/blastclust.sh'
 SCRIPT_BLASTP = 'scripts/blastp.sh'
 SCRIPT_PSIBLAST = 'scripts/psiblast.sh'
 
+FINAL_TEST_DIR = "data/svm/tests/final/"
+
 # URLS
 PDB_URL = 'http://files.rcsb.org/download/'
 
